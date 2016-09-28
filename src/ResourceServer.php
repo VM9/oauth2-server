@@ -109,10 +109,9 @@ class ResourceServer extends AbstractServer
         $accessTokenString = ($accessToken !== null)
                                 ? $accessToken
                                 : $this->determineAccessToken($headerOnly);
-
         // Set the access token
         $this->accessToken = $this->getAccessTokenStorage()->get($accessTokenString);
-
+        
         // Ensure the access token exists
         if (!$this->accessToken instanceof AccessTokenEntity) {
             throw new AccessDeniedException();
@@ -123,7 +122,7 @@ class ResourceServer extends AbstractServer
         if ($this->accessToken->isExpired() === true) {
             throw new AccessDeniedException();
         }
-
+        
         return true;
     }
 
@@ -138,16 +137,21 @@ class ResourceServer extends AbstractServer
      */
     public function determineAccessToken($headerOnly = false)
     {
-        if (!empty($this->getRequest()->headers->get('Authorization'))) {
+        if ($this->getRequest()->headers->get('Authorization') !== null) {
             $accessToken = $this->getTokenType()->determineAccessTokenInHeader($this->getRequest());
         } elseif ($headerOnly === false && (! $this->getTokenType() instanceof MAC)) {
-            $accessToken = ($this->getRequest()->server->get('REQUEST_METHOD') === 'GET')
-                                ? $this->getRequest()->query->get($this->tokenKey)
-                                : $this->getRequest()->request->get($this->tokenKey);
+            if($this->getRequest()->server->get('REQUEST_METHOD') === 'GET'){
+                $accessToken = $this->getRequest()->query->get($this->tokenKey);
+            }else{
+                $accessToken = $this->getRequest()->request->get($this->tokenKey);
+                if(null == $accessToken){
+                   $accessToken = $this->getRequest()->query->get($this->tokenKey); 
+                }
+            }
         }
-
+        
         if (empty($accessToken)) {
-            throw new InvalidRequestException('access token');
+            throw new InvalidRequestException('access_token');
         }
 
         return $accessToken;

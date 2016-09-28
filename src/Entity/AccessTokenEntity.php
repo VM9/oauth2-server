@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OAuth 2.0 Access token entity
  *
@@ -14,15 +15,14 @@ namespace League\OAuth2\Server\Entity;
 /**
  * Access token entity class
  */
-class AccessTokenEntity extends AbstractTokenEntity
-{
+class AccessTokenEntity extends AbstractTokenEntity {
+
     /**
      * Get session
      *
      * @return \League\OAuth2\Server\Entity\SessionEntity
      */
-    public function getSession()
-    {
+    public function getSession() {
         if ($this->session instanceof SessionEntity) {
             return $this->session;
         }
@@ -39,8 +39,7 @@ class AccessTokenEntity extends AbstractTokenEntity
      *
      * @return bool
      */
-    public function hasScope($scope)
-    {
+    public function hasScope($scope) {
         if ($this->scopes === null) {
             $this->getScopes();
         }
@@ -53,11 +52,10 @@ class AccessTokenEntity extends AbstractTokenEntity
      *
      * @return \League\OAuth2\Server\Entity\ScopeEntity[]
      */
-    public function getScopes()
-    {
+    public function getScopes() {
         if ($this->scopes === null) {
             $this->scopes = $this->formatScopes(
-                $this->server->getAccessTokenStorage()->getScopes($this)
+                    $this->server->getAccessTokenStorage()->getScopes($this)
             );
         }
 
@@ -67,27 +65,34 @@ class AccessTokenEntity extends AbstractTokenEntity
     /**
      * {@inheritdoc}
      */
-    public function save()
-    {
+    public function save() {
         $this->server->getAccessTokenStorage()->create(
-            $this->getId(),
-            $this->getExpireTime(),
-            $this->getSession()->getId()
+                $this->getId(), $this->getExpireTime(), $this->getSession()->getId()
         );
 
-        // Associate the scope with the token
-        foreach ($this->getScopes() as $scope) {
-            $this->server->getAccessTokenStorage()->associateScope($this, $scope);
-        }
+        //Muito lento criar a associativa entre sessão e token, e não há uso no scopo do figuardian.
 
+        //Inicia a sessão baseada no id do accesstoken
+//        if (session_status() == PHP_SESSION_NONE) {
+//            $config = \Application\Main::getConfig();
+//            \Application\Security\SessionManager::$_id = $this->getId();
+//            \Application\Security\SessionManager::sessionStart($config->get('sys.codename'));
+//        }
+//
+//        $this->server->getAccessTokenStorage()->getScopes($this); //Então eu forço a geração do cache em sessão para os scopes.
+        // Associate the scope with the token
+//        foreach ($this->getScopes() as $scope) {
+//            $this->server->getAccessTokenStorage()->associateScope($this, $scope);
+//        }
+//        exit;
         return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function expire()
-    {
+    public function expire() {
         $this->server->getAccessTokenStorage()->delete($this);
     }
+
 }

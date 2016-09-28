@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OAuth 2.0 Client entity
  *
@@ -16,8 +17,8 @@ use League\OAuth2\Server\AbstractServer;
 /**
  * Client entity class
  */
-class ClientEntity
-{
+class ClientEntity {
+
     use EntityTrait;
 
     /**
@@ -56,14 +57,25 @@ class ClientEntity
     protected $server;
 
     /**
+     * Default language from client
+     * @var type string
+     */
+    private $i18n = "pt-br";
+
+    /**
+     * Instituition id
+     * @var type 
+     */
+    private $institution_id = null;
+
+    /**
      * __construct
      *
      * @param \League\OAuth2\Server\AbstractServer $server
      *
      * @return self
      */
-    public function __construct(AbstractServer $server)
-    {
+    public function __construct(AbstractServer $server) {
         $this->server = $server;
 
         return $this;
@@ -74,8 +86,7 @@ class ClientEntity
      *
      * @return string
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -84,8 +95,7 @@ class ClientEntity
      *
      * @return string
      */
-    public function getSecret()
-    {
+    public function getSecret() {
         return $this->secret;
     }
 
@@ -94,18 +104,33 @@ class ClientEntity
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
     /**
-     * Returnt the client redirect URI
+     * Return the client redirect URI
      *
      * @return string
      */
-    public function getRedirectUri()
-    {
+    public function getRedirectUri() {
         return $this->redirectUri;
+    }
+
+    /**
+     * Return client default language in i18n format
+     * @return type
+     */
+    public function geti18n() {
+        $defaultLang = \Application\Main::$_config->get('sys.i18n');
+        return (empty($this->i18n))? $defaultLang : $this->i18n;        
+    }
+
+    /**
+     * Return client default language in i18n format
+     * @return type
+     */
+    public function getInstitutionId() {
+        return $this->institution_id;
     }
 }

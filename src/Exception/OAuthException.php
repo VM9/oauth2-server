@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OAuth 2.0 Base Exception
  *
@@ -17,8 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Exception class
  */
-class OAuthException extends \Exception
-{
+class OAuthException extends \Exception {
+
     /**
      * The HTTP status code for this exception that should be sent in the response
      */
@@ -46,9 +47,8 @@ class OAuthException extends \Exception
      *
      * @param string $msg Exception Message
      */
-    public function __construct($msg = 'An error occured')
-    {
-        parent::__construct($msg);
+    public function __construct($msg = 'An error occured', $code = 400, $previous = null) {
+        parent::__construct($msg, $code, $previous);
     }
 
     /**
@@ -56,8 +56,7 @@ class OAuthException extends \Exception
      *
      * @return bool
      */
-    public function shouldRedirect()
-    {
+    public function shouldRedirect() {
         return is_null($this->redirectUri) ? false : true;
     }
 
@@ -66,14 +65,12 @@ class OAuthException extends \Exception
      *
      * @return string|null
      */
-    public function getRedirectUri()
-    {
+    public function getRedirectUri() {
         return RedirectUri::make(
-            $this->redirectUri,
-            [
-                'error' =>  $this->errorType,
-                'message' =>  $this->getMessage(),
-            ]
+                        $this->redirectUri, [
+                    'error' => $this->errorType,
+                    'message' => $this->getMessage(),
+                        ]
         );
     }
 
@@ -82,8 +79,7 @@ class OAuthException extends \Exception
      *
      * @return string
      */
-    public function getParameter()
-    {
+    public function getParameter() {
         return $this->parameter;
     }
 
@@ -92,8 +88,7 @@ class OAuthException extends \Exception
      *
      * @return array Array with header values
      */
-    public function getHttpHeaders()
-    {
+    public function getHttpHeaders() {
         $headers = [];
         switch ($this->httpStatusCode) {
             case 401:
@@ -136,10 +131,11 @@ class OAuthException extends \Exception
                 }
             }
             if ($authScheme !== null) {
-                $headers[] = 'WWW-Authenticate: '.$authScheme.' realm=""';
+                $headers[] = 'WWW-Authenticate: ' . $authScheme . ' realm=""';
             }
         }
         // @codeCoverageIgnoreEnd
         return $headers;
     }
+
 }

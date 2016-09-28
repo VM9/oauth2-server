@@ -79,11 +79,13 @@ class ClientCredentialsGrant extends AbstractGrant
             null,
             $this->getIdentifier()
         );
+        
 
         if (($client instanceof ClientEntity) === false) {
             $this->server->getEventEmitter()->emit(new Event\ClientAuthenticationFailedEvent($this->server->getRequest()));
             throw new Exception\InvalidClientException();
         }
+        
 
         // Validate any scopes that are in the request
         $scopeParam = $this->server->getRequest()->request->get('scope', '');
@@ -93,6 +95,7 @@ class ClientCredentialsGrant extends AbstractGrant
         $session = new SessionEntity($this->server);
         $session->setOwner('client', $client->getId());
         $session->associateClient($client);
+        
 
         // Generate an access token
         $accessToken = new AccessTokenEntity($this->server);
@@ -112,6 +115,7 @@ class ClientCredentialsGrant extends AbstractGrant
         $session->save();
         $accessToken->setSession($session);
         $accessToken->save();
+        
 
         $this->server->getTokenType()->setSession($session);
         $this->server->getTokenType()->setParam('access_token', $accessToken->getId());
